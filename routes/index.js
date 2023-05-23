@@ -1,7 +1,11 @@
 const { Router } = require("express");
 const router = Router();
 
-router.use("/items", require('./items'));
+router.use("/airports", require('./airports'));
+// router.use("/runways", require('./runways'));
+// router.use("/departures", require('./departures'));
+
+
 router.get("/", (req, res, next) => {
   res.send(`
     <html>
