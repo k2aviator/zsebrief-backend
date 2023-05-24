@@ -6,7 +6,7 @@ router.use(cors());
 
 router.use("/airports", require('./airports'));
 router.use("/departures", require('./departures'));
-// router.use("/runways", require('./runways'));
+router.use("/runways", require('./runways'));
 
 
 
@@ -17,6 +17,7 @@ router.get("/", (req, res, next) => {
         <h1> ZSEBrief Backend </h1>
         <a href="/airports">GET Airports</a><br>
         <a href="/departures">GET Departures</a><br>
+        <a href="/runways">GET Runways</a><br>
       </body>
     </html>
   `)
