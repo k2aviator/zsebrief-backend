@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
-const Airports = require('../models/airports');
+const Departures = require('../models/departures');
 
 module.exports = {};
 
-// module.exports.create = async (name) => {
-//     const airports = await Airports.create({ name });
-//     return airports;
-// }
+module.exports.create = async (name) => {
+    const departures = await Departures.create({ name });
+    return departures;
+}
 
 module.exports.getAll = async () => {
     //console.log("DAO function")
-    const airports = await Airports.find().lean();
-    return airports;
+    const departures = await Departures.find().lean();
+    return departures;
 }
 
 // module.exports.getById = async (airportId) => {

@@ -1,7 +1,17 @@
-// const { Router } = require("express");
-// const router = Router();runways
+const { Router } = require("express");
+const router = Router();
 
-// const departuresDAO = require('../daos/departures');
+const departuresDAO = require('../daos/departures');
 
 
-// module.exports = router;
+
+router.get("/", async (req, res, next) => {
+    const departures = await departuresDAO.getAll();
+    if (departures) {
+        return res.json(departures);
+    } else {
+        res.sendStatus(404);
+    }
+})
+
+module.exports = router;
