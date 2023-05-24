@@ -4,10 +4,10 @@ const Runways = require('../models/runways');
 
 module.exports = {};
 
-module.exports.create = async (name) => {
-    const runways = await Runways.create({ name });
-    return runways;
-}
+// module.exports.create = async (name) => {
+//     const runways = await Runways.create({ name });
+//     return runways;
+// }
 
 module.exports.getAll = async () => {
     //console.log("DAO function")
