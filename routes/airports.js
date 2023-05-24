@@ -13,7 +13,6 @@ router.post("/", async (req, res, next) => {
 router.get("/", async (req, res, next) => {
     console.log("Route function")
     const airports = await airportsDAO.getAll();
-    console.log("airports is ", airports)
     if (airports) {
         return res.json(airports);
     } else {
