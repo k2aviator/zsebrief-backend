@@ -10,7 +10,7 @@ module.exports.create = async (name) => {
 }
 
 module.exports.getAll = async () => {
-    console.log("DAO function")
+    //console.log("DAO function")
     const airports = await Airports.find().lean();
     return airports;
 }

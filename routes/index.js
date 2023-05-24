@@ -1,5 +1,8 @@
 const { Router } = require("express");
 const router = Router();
+const cors = require('cors')
+
+router.use(cors());
 
 router.use("/airports", require('./airports'));
 // router.use("/runways", require('./runways'));
