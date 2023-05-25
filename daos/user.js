@@ -29,9 +29,13 @@ module.exports.getUserById = async (userId) => {
 }
 
 module.exports.checkPassword = async (userId, password) => {
+    //console.log("User DAO, check password")
     const userRecord = await Users.find({email:userId})
     const userRecordPassword = userRecord[0].password
+    //console.log("user record is ", userRecord, " password is ", userRecordPassword)
+    //console.log("password to compare is ", password)
     const toMatch = await bcrypt.compare(password,userRecordPassword)
+    //console.log("to match result is ", toMatch)
     return toMatch
 }
 

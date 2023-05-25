@@ -64,100 +64,99 @@ router.post("/signup", async (req, res, next) => {
     }
 });
 
-
-
-// router.post("/", async (req, res, next) => {
-//     try {
-//     //console.log("post request body" , req.body)
-//     const userEmail = req.body.email
-//     const userPassword = req.body.password
-//     if (!userPassword){
-//         return res.status(400).send("") 
-//     }
-//     const findUser = await userDAO.getUser(req.body.email)
-//     //console.log("returned find user is ", findUser)
-//     if (!findUser == false){
-//         if(!req.body.password){
-//             return res.status(400).send("no password provided") 
-//         } else {
-//             const checkPass = await userDAO.checkPassword(req.body.email, req.body.password)
-//             if (checkPass == true){
-//                 //console.log("find user is ", findUser[0])
-//                 const userId = findUser[0]._id
-//                 const userEmail = findUser[0].email
-//                 const userRoles = findUser[0].roles
-//                 //console.log("request user is ", req.user)
-//                 //console.log("user id is ", userId, " user email is ", userEmail, " and user role is ", userRoles)
-//                 //let token = jwt.sign({email: userEmail,_id: userId, roles:['user']}, secret)
-//                 let token = jwt.sign({email: userEmail,_id: userId, roles:userRoles}, secret)              
-//                 req.headers.authorization = token
-//                 //console.log("returned token is ", token)
-//                 res.json({token})
-//             } else {
-//                 return res.status(401).send("") 
-//             }
-//         }
+router.post("/", async (req, res, next) => {
+    try {
+    //console.log("post request body" , req.body)
+    const userEmail = req.body.email
+    const userPassword = req.body.password
+    if (!userPassword){
+        return res.status(400).send("") 
+    }
+    const findUser = await userDAO.getUser(req.body.email)
+    //console.log("returned find user is ", findUser)
+    if (!findUser == false){
+        if(!req.body.password){
+            return res.status(400).send("no password provided") 
+        } else {
+            const checkPass = await userDAO.checkPassword(req.body.email, req.body.password)
+            if (checkPass == true){
+                //console.log("find user is ", findUser[0])
+                const userId = findUser[0]._id
+                const userEmail = findUser[0].email
+                const userRoles = findUser[0].roles
+                //console.log("request user is ", req.user)
+                //console.log("user id is ", userId, " user email is ", userEmail, " and user role is ", userRoles)
+                //let token = jwt.sign({email: userEmail,_id: userId, roles:['user']}, secret)
+                let token = jwt.sign({email: userEmail,_id: userId, roles:userRoles}, secret)              
+                req.headers.authorization = token
+                //console.log("returned token is ", token)
+                res.json({token})
+            } else {
+                //console.log("401 error")
+                return res.status(401).send("") 
+            }
+        }
    
-//     } else {
-//         //console.log("RETURN user doesn't exist")
-//         return res.status(401).send("user doesn't exist")
-//     }     
+    } else {
+        //console.log("RETURN user doesn't exist")
+        return res.status(401).send("user doesn't exist")
+    }     
      
-//     } catch(e) {  
-//         console.log(e)
-//         next(e)
-//     }
-// });
+    } catch(e) {  
+        console.log(e)
+        next(e)
+    }
+});
 
-// router.use(async (req,res, next) => {
-//     try {
-//         let token = req.headers.authorization
-//         if (!token || !token.indexOf('Bearer ') === 0 ){ 
-//             res.status(401).send("Token not present")
-//         } else {
-//             token = token.replace('Bearer ', '')
-//             //console.log("token is valid ", token)
-//             try {
-//                 const verifyUserId = jwt.verify(token, secret)
-//                 //console.log("verified user information is ", verifyUserId)
-//                 next()
-//             } catch(e){
-//                 res.status(401).send("invalid token")
-//                 next(e)
-//             }
+router.use(async (req,res, next) => {
+    try {
+        let token = req.headers.authorization
+        if (!token || !token.indexOf('Bearer ') === 0 ){ 
+            res.status(401).send("Token not present")
+        } else {
+            token = token.replace('Bearer ', '')
+            //console.log("token is valid ", token)
+            try {
+                const verifyUserId = jwt.verify(token, secret)
+                //console.log("verified user information is ", verifyUserId)
+                next()
+            } catch(e){
+                res.status(401).send("invalid token")
+                next(e)
+            }
            
-//         }
-//     } catch (e) {
-//         next(e)
-//     }
+        }
+    } catch (e) {
+        next(e)
+    }
 
-// });
+});
 
 
-// router.post("/password", isAuthorized, async (req, res, next) => {
-//     try {
-//         //console.log('POST PASS FUNCTION')
-//         const bodyPassword = req.body.password
-//         const userId = req.user._id
-//         if (!bodyPassword){
-//             res.status(400).send("no password provided")
-//         } else {
-//             const hashedPass = await userDAO.hashPassword(bodyPassword)
-//             const updatedPassword = await userDAO.updateUserPassword(userId, hashedPass)
-//             if (updatedPassword === true){
-//                 //console.log("POST PASS - password updated to  ", bodyPassword, " send status 200")
-//                 return res.status(200).send("updated password")
-//             } else {
-//                 //console.log("POST PASS - unable to update password ", updatedPassword)
-//                 return res.status(401).send("")
-//             }
-//         }
-//         next()
-//     } catch(e) {
-//         console.log(e)
-//         next(e)
-//     }
-// });
+router.post("/password", isAuthorized, async (req, res, next) => {
+    try {
+        //console.log('POST PASS FUNCTION')
+        const bodyPassword = req.body.password
+        const userId = req.user._id
+        if (!bodyPassword){
+            res.status(400).send("no password provided")
+        } else {
+            const hashedPass = await userDAO.hashPassword(bodyPassword)
+            const updatedPassword = await userDAO.updateUserPassword(userId, hashedPass)
+            if (updatedPassword === true){
+                //console.log("POST PASS - password updated to  ", bodyPassword, " send status 200")
+                return res.status(200).send("updated password")
+            } else {
+                //console.log("POST PASS - unable to update password ", updatedPassword)
+                return res.status(401).send("")
+            }
+        }
+        next()
+    } catch(e) {
+        console.log(e)
+        next(e)
+    }
+});
 
 
 
