@@ -7,6 +7,7 @@ router.use(cors());
 router.use("/airports", require('./airports'));
 router.use("/departures", require('./departures'));
 router.use("/runways", require('./runways'));
+router.use("/login", require('./login'));
 
 
 
@@ -18,6 +19,7 @@ router.get("/", (req, res, next) => {
         <a href="/airports">GET Airports</a><br>
         <a href="/departures">GET Departures</a><br>
         <a href="/runways">GET Runways</a><br>
+        <a href="/login">GET Users</a><br>
       </body>
     </html>
   `)
