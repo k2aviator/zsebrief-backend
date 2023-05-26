@@ -89,7 +89,7 @@ router.post("/", async (req, res, next) => {
                 //let token = jwt.sign({email: userEmail,_id: userId, roles:['user']}, secret)
                 let token = jwt.sign({email: userEmail,_id: userId, roles:userRoles}, secret)              
                 req.headers.authorization = token
-                //console.log("returned token is ", token)
+                console.log("returned token is ", token)
                 res.json({token})
             } else {
                 //console.log("401 error")
