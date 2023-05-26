@@ -28,6 +28,19 @@ module.exports.getUserById = async (userId) => {
     }
 }
 
+module.exports.getRoleByUserId = async (userId) => {
+    const userRecord = await Users.find({_id:userId}).lean()
+    const userRole = userRecord[0].roles
+    const isAdmin = userRole.includes("admin")
+    //console.log("is admin? ", isAdmin, " is user? ", isUser)
+    if (isAdmin) { 
+        return true
+    } else {
+        return false
+    }
+}
+
+
 module.exports.checkPassword = async (userId, password) => {
     //console.log("User DAO, check password")
     const userRecord = await Users.find({email:userId})

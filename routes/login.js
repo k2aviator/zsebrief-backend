@@ -64,6 +64,25 @@ router.post("/signup", async (req, res, next) => {
     }
 });
 
+
+router.post("/isadmin", async(req, res, next) => {
+    try {
+        //console.log("is admin checker function")
+        // console.log("request headers token", req.headers.token)
+        const verifyUserId = jwt.verify(req.headers.token, secret)
+        const userId = verifyUserId._id
+        // console.log("verified user id is ", verifyUserId, " user id is ", userId)
+        const isAdmin = await userDAO.getRoleByUserId(userId)
+        //console.log("is admin result ", isAdmin)
+        return res.json({"admin":isAdmin})
+    } catch(e) {  
+        console.log(e)
+        next(e)
+    }
+
+}) 
+
+
 router.post("/", async (req, res, next) => {
     try {
     //console.log("post request body" , req.body)
@@ -90,7 +109,7 @@ router.post("/", async (req, res, next) => {
                 let token = jwt.sign({email: userEmail,_id: userId, roles:userRoles}, secret)              
                 req.headers.authorization = token
                 console.log("returned token is ", token)
-                res.json({token})
+                return res.json({token})
             } else {
                 //console.log("401 error")
                 return res.status(401).send("") 
