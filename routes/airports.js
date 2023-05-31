@@ -36,16 +36,17 @@ router.post("/:ICAO", isAdmin, async (req, res, next) => {
 //Need to add back isAdmin function
 router.put("/:ICAO", isAdmin, async (req, res, next) => {
     try {
-        //console.log("AIRPORT PUT ROUTE")
+        console.log("AIRPORT PUT ROUTE")
         let token = req.headers.authorization
         token = token.replace('Bearer ', '')
         const verifyUserId = jwt.verify(token, secret)
         req.user = verifyUserId
         const userEmail = req.user.email
-        // console.log("user is ", userEmail)
+        //console.log("user is ", userEmail)
         const airportDetails = req.body
+        //console.log("request body is ", airportDetails)
         const updatedAirport = await airportsDAO.updateAirport(airportDetails, userEmail)
-        //console.log("updated airport returned is ", updatedAirport)
+        console.log("updated airport returned is ", updatedAirport)
         return res.json(updatedAirport);
     } catch(e) {
         next(e)

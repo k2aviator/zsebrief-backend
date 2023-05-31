@@ -16,71 +16,77 @@ module.exports.getAll = async () => {
     return airports;
 }
 
+// const airportLat = airportDetails.LAT;
+// const airportLong = airportDetails.LONG;
+// LAT: airportLat,
+// LONG: airportLong,
 
 module.exports.updateAirport = async (airportDetails, userEmail) => {
-    const airportICAO = airportDetails.ICAO;
-    const airportElev = airportDetails.ELEV;
-    const airportHrsClose = airportDetails.HRS_CLOSE;
-    const airportHrsOpen = airportDetails.HRS_OPEN;
-    const airportLat = airportDetails.LAT;
-    const airportLong = airportDetails.LONG;
-    const airportName = airportDetails.NAME;
-    const airportNotes = airportDetails.NOTES;
-    const airportTowered = airportDetails.TOWERED;
+    const airportICAO = airportDetails.find((item) => item.ICAO).ICAO;
     const airportUpdated = new Date();
-    
-    const updateQuery = {
-      ICAO: airportICAO
-    };
-    
-    const updateData = {
-      ELEV: airportElev,
-      HRS_CLOSE: airportHrsClose,
-      HRS_OPEN: airportHrsOpen,
-      LAT: airportLat,
-      LONG: airportLong,
-      NAME: airportName,
-      NOTES: airportNotes,
-      TOWERED: airportTowered,
-      UPDATED_BY: userEmail,
-      UPDATED_AT: airportUpdated
-    };
-
+  
+    const updateQuery = { ICAO: airportICAO };
+  
+    const updateData = airportDetails.reduce((acc, item) => {
+      const key = Object.keys(item)[0];
+      const value = item[key];
+      acc[key] = value;
+      return acc;
+    }, {});
+  
+    updateData.UPDATED_BY = userEmail;
+    updateData.UPDATED = airportUpdated;
+  
+    // console.log("airport details are ", airportDetails);
+    console.log("update data is ", updateData);
+  
     const updatedAirport = await Airports.updateOne(updateQuery, updateData);
-    const results = updatedAirport.acknowledged
-    const retrieveUpdatedAirport = await Airports.findOne({ICAO:airportICAO}).lean();
-    //console.log("updated airport in dao is ", retrieveUpdatedAirport)
-    if (results === true){
-        return retrieveUpdatedAirport;
+    const results = updatedAirport.acknowledged;
+  
+    const retrieveUpdatedAirport = await Airports.findOne({ ICAO: airportICAO }).lean();
+    console.log("updated airport in dao is ", retrieveUpdatedAirport);
+  
+    if (results === true) {
+      return retrieveUpdatedAirport;
     }
-    
-}
+  };
 
 // module.exports.updateAirport = async (airportDetails, userEmail) => {
-//     //console.log("DAO  - update items")
-//     console.log("airport details in DAO ", airportDetails)
-//     //NEED TO FIGURE OUT BEST WAY TO BULK UPDATE
-//     const airportICAO = airportDetails.ICAO
-//     const airportElev = airportDetails.ELEV
-//     const airportHrsClose = airportDetails.HRS_CLOSE
-//     const airportHrsOpen = airportDetails.HRS_OPEN
-//     const airportLat = airportDetails.LAT
-//     const airportLong = airportDetails.LONG
-//     const airportName = airportDetails.NAME
-//     const airportNotes = airportDetails.NOTES
-//     const airportTowered = airportDetails.TOWERED
+//     const airportICAO = airportDetails.ICAO;
+//     const airportElev = airportDetails.ELEV;
+//     const airportHrsClose = airportDetails.HRS_CLOSE;
+//     const airportHrsOpen = airportDetails.HRS_OPEN;
+//     const airportName = airportDetails.NAME;
+//     const airportNotes = airportDetails.NOTES;
+//     const airportTowered = airportDetails.TOWERED;
 //     const airportUpdated = new Date();
-//     console.log("airport updated" , airportUpdated)
-//     //console.log("airspace class ", airspaceClass)
-//     const updatedAirport = await Airports.updateOne({ICAO:airportICAO},{ELEV:airportElev}, {UPDATED_BY:userEmail}).lean();
+    
+//     const updateQuery = {
+//       ICAO: airportICAO
+//     };
+    
+//     const updateData = {
+//       ELEV: airportElev,
+//       HRS_CLOSE: airportHrsClose,
+//       HRS_OPEN: airportHrsOpen,
+//       NAME: airportName,
+//       NOTES: airportNotes,
+//       TOWERED: airportTowered,
+//       UPDATED_BY: userEmail,
+//       UPDATED_AT: airportUpdated
+//     };
+//     console.log("airport details are ", airportDetails)
+//     console.log("update data is ", updateData)
+//     const updatedAirport = await Airports.updateOne(updateQuery, updateData);
 //     const results = updatedAirport.acknowledged
 //     const retrieveUpdatedAirport = await Airports.findOne({ICAO:airportICAO}).lean();
-//     //console.log("updated airport in dao is ", retrieveUpdatedAirport)
+//     console.log("updated airport in dao is ", retrieveUpdatedAirport)
 //     if (results === true){
 //         return retrieveUpdatedAirport;
 //     }
     
 // }
+
 
 module.exports.getByCode = async (icaoCode) => {
     //console.log("icao code is ", icaoCode)
