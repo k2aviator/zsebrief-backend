@@ -38,13 +38,13 @@ module.exports.updateAirport = async (airportDetails, userEmail) => {
     updateData.UPDATED = airportUpdated;
   
     // console.log("airport details are ", airportDetails);
-    console.log("update data is ", updateData);
+    //console.log("update data is ", updateData);
   
     const updatedAirport = await Airports.updateOne(updateQuery, updateData);
     const results = updatedAirport.acknowledged;
   
     const retrieveUpdatedAirport = await Airports.findOne({ ICAO: airportICAO }).lean();
-    console.log("updated airport in dao is ", retrieveUpdatedAirport);
+    //console.log("updated airport in dao is ", retrieveUpdatedAirport);
   
     if (results === true) {
       return retrieveUpdatedAirport;
