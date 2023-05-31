@@ -1,13 +1,13 @@
 const { Router } = require("express");
 const router = Router();
-
+const isAdmin = require('../utils/isadmin.js');
 const airportsDAO = require('../daos/airports');
+const userDAO = require('../daos/user');
+const jwt = require('jsonwebtoken')
+const secret = 'Harraseeket'
 
-// router.post("/", async (req, res, next) => {
-//     const { name } = req.body;
-//     const airport = await airportsDAO.create(name);
-//     res.json(airport);
-// });
+
+
 
 
 router.get("/", async (req, res, next) => {
@@ -19,24 +19,50 @@ router.get("/", async (req, res, next) => {
     }
 })
 
-// router.get("/:id", async (req, res, next) => {
-//     const airportId = req.params.id;
-//     const airport = await airportsDAO.getById(airportId);
-//     if (airport) {
-//         res.json(airport);
-//     } else {
-//         res.sendStatus(404);
-//     }
-// });
+router.post("/:ICAO", isAdmin, async (req, res, next) => {
+    try{
+    const airportDetails = req.body;
+    // console.log("POST FUNCTION")z
+    // console.log("airport details are ", airportDetails)
+    // console.log("request user is ", req.user)
+    const createdAirport = await airportsDAO.create(airportDetails);
+    res.json(createdAirport);
+    }catch(e) {
+        next(e)
+    }
+});
 
-// router.put("/", async (req, res, next) => {
-//     const airport = await airportsDAO.updateAirports();
-//     if (airport) {
-//         res.json(airport);
-//     } else {
-//         res.sendStatus(404);
-//     }
-// });
 
+//Need to add back isAdmin function
+router.put("/:ICAO", isAdmin, async (req, res, next) => {
+    try {
+        //console.log("AIRPORT PUT ROUTE")
+        let token = req.headers.authorization
+        token = token.replace('Bearer ', '')
+        const verifyUserId = jwt.verify(token, secret)
+        req.user = verifyUserId
+        const userEmail = req.user.email
+        // console.log("user is ", userEmail)
+        const airportDetails = req.body
+        const updatedAirport = await airportsDAO.updateAirport(airportDetails, userEmail)
+        //console.log("updated airport returned is ", updatedAirport)
+        return res.json(updatedAirport);
+    } catch(e) {
+        next(e)
+    }
+});
+
+
+router.get("/:ICAO", async (req, res, next) => {
+    //console.log("get by ICAO code")
+    const icaoCode = req.params.ICAO;
+    const airport = await airportsDAO.getByCode(icaoCode);
+    //console.log('returned airport is ', airport)
+    if (airport) {
+        res.json(airport);
+    } else {
+        res.sendStatus(404);
+    }
+});
 
 module.exports = router;

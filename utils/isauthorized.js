@@ -9,31 +9,31 @@ const secret = 'Harraseeket'
 const isAuthorized = async (req,res,next) => {
     try {
         let token = req.headers.authorization
-        //console.log("request headers of authorization ", req.headers, "request body is ", req.body )
         if (!token || !token.indexOf('Bearer ') === 0 ){ 
-            //console.log("token not present - send 401")
-            res.status(401).send("Token not present")
+            if (req.url === "/logout" && req.method === "POST"){
+                res.status(404).send("Post before logout, send 404")
+            } else if (req.method === "POST" && !req.body.password){
+                res.status(400).send("No password")
+            } else {
+                next()
+            }          
         } else {
+            // console.log('is authorized: req url', req.url, ' token? ', token, ' method', req.method)
             token = token.replace('Bearer ', '')
-            //console.log("token is valid ", token)
             try {
                 const verifyUserId = jwt.verify(token, secret)
-                //console.log("verified user information is ", verifyUserId)
+                //console.log("verified user information for login function ", verifyUserId)
                 req.user = verifyUserId
-                //return(req.user)
                 next()
             } catch(e){
-                //console.log("invalid token - send 401")
                 res.status(401).send("invalid token")
                 next(e)
             }
            
         }
     } catch (e) {
-        console.log(e)
         next(e)
     }
-
 }
 
 

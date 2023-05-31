@@ -7,15 +7,19 @@ module.exports = {};
 
 module.exports.createUser = async (username, hashedPass) => {
     const addedUser = await Users.create({email:username, password:hashedPass, roles:['user']})
-    return true;
+    const returnedUser = await Users.find({email:username}, {'email':1, 'roles':1})
+    //console.log("added user is ", returnedUser )
+    return returnedUser;
 }
 
 module.exports.getUser = async (userName) => {
-    const userRecord = await Users.find({email:userName})
+    let userRecord = await Users.find({email:userName}, {'email':1, 'roles':1}).lean()
+    //console.log("dao user record is ", userRecord)
+    //console.log("dao user record length is ", userRecord.length)
     if (userRecord.length == 0) {
         return false
     } else {
-        return userRecord 
+        return userRecord[0]
     }
 }
 

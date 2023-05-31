@@ -10,7 +10,6 @@ const User = require('../models/user');
 describe("/login", () => {
   beforeAll(testUtils.connectDB);
   afterAll(testUtils.stopDB);
-
   afterEach(testUtils.clearDB);
 
   const user0 = {
