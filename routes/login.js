@@ -60,6 +60,25 @@ router.post("/signup", async (req, res, next) => {
     }
 });
 
+router.post("/isadmin", async(req, res, next) => {
+    try {
+        //console.log("is admin checker function")
+        let token = req.headers.authorization
+        token = token.replace('Bearer ', '')
+        //console.log("token in is admin function is ", token)
+        const verifyUserId = jwt.verify(token, secret)
+        const userId = verifyUserId._id
+        // console.log("verified user id is ", verifyUserId, " user id is ", userId)
+        const isAdmin = await userDAO.getRoleByUserId(userId)
+        //console.log("is admin result ", isAdmin)
+        return res.json({"admin":isAdmin})
+    } catch(e) {  
+        console.log(e)
+        next(e)
+    }
+
+});
+
 router.post("/", async (req, res, next) => {
     try {
     //console.log("post request body" , req.body)
@@ -101,7 +120,7 @@ router.post("/", async (req, res, next) => {
      
     } catch(e) {  
         // console.log(e)
-        // next(e)
+        next(e)
     }
 });
 
@@ -128,7 +147,7 @@ router.post("/password", async (req, res, next) => {
         next()
     } catch(e) {
         // console.log(e)
-        // next(e)
+        next(e)
     }
 });
 
