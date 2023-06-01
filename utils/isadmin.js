@@ -5,7 +5,7 @@ const secret = 'Harraseeket'
 
 const isAdmin = async (req,res,next) => {
     try {
-        console.log("is admin function")
+        //console.log("is admin function")
         let token = req.headers.authorization
         //console.log("request token is ", token )
         if (!token || !token.indexOf('Bearer ') === 0 ){ 

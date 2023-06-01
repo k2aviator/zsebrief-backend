@@ -22,25 +22,27 @@ module.exports.getAll = async () => {
 // LONG: airportLong,
 
 module.exports.updateAirport = async (airportDetails, userEmail) => {
-    const airportICAO = airportDetails.find((item) => item.ICAO).ICAO;
+    // console.log("airport dao function")
+    // console.log("NEED TO REDUCE THE ARRAY IN THE BODY BEFORE IT IS SENT")
+    // console.log("airport details are ", airportDetails)
+    const airportICAO = airportDetails.ICAO;
     const airportUpdated = new Date();
   
     const updateQuery = { ICAO: airportICAO };
   
-    const updateData = airportDetails.reduce((acc, item) => {
-      const key = Object.keys(item)[0];
-      const value = item[key];
-      acc[key] = value;
-      return acc;
-    }, {});
+    // const updateData = airportDetails.reduce((acc, item) => {
+    //   const key = Object.keys(item)[0];
+    //   const value = item[key];
+    //   acc[key] = value;
+    //   return acc;
+    // }, {});
   
-    updateData.UPDATED_BY = userEmail;
-    updateData.UPDATED = airportUpdated;
-  
-    // console.log("airport details are ", airportDetails);
-    //console.log("update data is ", updateData);
-  
-    const updatedAirport = await Airports.updateOne(updateQuery, updateData);
+    
+    airportDetails.UPDATED_BY = userEmail;
+    airportDetails.UPDATED = airportUpdated;
+ 
+    // console.log("updated details are  ", airportDetails);
+    const updatedAirport = await Airports.updateOne(updateQuery, airportDetails);
     const results = updatedAirport.acknowledged;
   
     const retrieveUpdatedAirport = await Airports.findOne({ ICAO: airportICAO }).lean();

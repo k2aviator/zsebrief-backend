@@ -12,6 +12,8 @@ describe("/airports", () => {
   afterAll(testUtils.stopDB);
   afterEach(testUtils.clearDB);
 
+  const newDate = new Date();
+
   const airport0 = 
   {
     AIRSPACE_CLASS: "E",
@@ -24,7 +26,6 @@ describe("/airports", () => {
     NAME: "Corvallis Municipal Airport",
     NOTES: "",
     TOWERED: "FALSE",
-    UPDATED: "3/14/2023",
     UPDATED_BY: "user1@gmail.com"
   }
   const airport1 = 
@@ -39,7 +40,6 @@ describe("/airports", () => {
     NAME: "Eastern Oregon Regional Airport at Pendleton",
     NOTES: "",
     TOWERED: "TRUE",
-    UPDATED: "2/26/2023",
     UPDATED_BY: "user1@gmail.com"
   }
   describe('After login', () => {
