@@ -1,8 +1,26 @@
 const { Router } = require("express");
 const router = Router();
+// const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors')
 
 router.use(cors());
+
+// router.use(
+//   '/airports',
+//   createProxyMiddleware({
+//     target: 'http://localhost:3001',
+//     changeOrigin: true,
+//   })
+// );
+
+
+// router.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+//   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   next();
+// });
 
 router.use("/airports", require('./airports'));
 router.use("/departures", require('./departures'));
