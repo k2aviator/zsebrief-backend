@@ -1,24 +1,8 @@
 const { Router } = require("express");
 const router = Router();
-// const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors')
 
 router.use(cors());
-
-// router.use(
-//   '/airports',
-//   createProxyMiddleware({
-//     target: 'https://zsebrief-backend-production.up.railway.app',
-//     changeOrigin: true,
-//   })
-// );
-
-// // Proxy to your local server (e.g., running on port 3000)
-// router.use('/local', createProxyMiddleware({
-//   target: 'http://localhost:3001',
-//   changeOrigin: true,
-// }));
-
 
 router.use("/airports", require('./airports'));
 router.use("/departures", require('./departures'));

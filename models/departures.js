@@ -12,7 +12,8 @@ const departuresSchema = new mongoose.Schema({
   RWY_SPECIFIC: {type: String },
   TOP_ALT: {type: String },
   TOP_ALT_LISTED:  {type: String },
-  TYPE: { type: String }
+  TYPE: { type: String },
+  UPDATED_BY: { type: String }
 });
 
 

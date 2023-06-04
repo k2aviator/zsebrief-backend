@@ -143,29 +143,63 @@ describe("/airports", () => {
       });
     });
     describe("GET /", () => {
-      let airports;
-      beforeEach(async () => {
-      airports = (await Airports.insertMany([airport0, airport1])).map(i => i.toJSON())
-      airports.forEach(i => i._id = i._id.toString());
+        let airports;
+        beforeEach(async () => {
+        airports = (await Airports.insertMany([airport0, airport1])).map(i => i.toJSON())
+        airports.forEach(i => i._id = i._id.toString());
+        });
+        it('should send 200 to normal user and return all items', async () => {
+          const res = await request(server)
+            .get("/airports/")
+            .set('Authorization', 'Bearer ' + token0)
+            .send();
+          expect(res.statusCode).toEqual(200);
+          expect(res.body).toMatchObject(airports);
+        });
+        it('should send 200 to admin user and return all items', async () => {
+          const res = await request(server)
+            .get("/airports/")
+            .set('Authorization', 'Bearer ' + adminToken)
+            .send();
+          expect(res.statusCode).toEqual(200);
+          expect(res.body).toMatchObject(airports);
+          });
       });
-      it('should send 200 to normal user and return all items', async () => {
-        const res = await request(server)
-          .get("/airports/")
-          .set('Authorization', 'Bearer ' + token0)
+      describe("DELETE / airport %#", () => {
+        let aptToDelete; 
+        beforeEach(async () => {
+          const res = await request(server)
+            .post("/airports/" + airport0.ICAO)
+            .set('Authorization', 'Bearer ' + adminToken)
+            .send(airport0);
+          aptToDelete = res.body;
+        });
+        beforeEach(async () => {
+          const res = await request(server)
+          .get("/airports/" + airport0.ICAO)
           .send();
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toMatchObject(airports);
-      });
-      it('should send 200 to admin user and return all items', async () => {
-        const res = await request(server)
-          .get("/airports/")
-          .set('Authorization', 'Bearer ' + adminToken)
-          .send();
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toMatchObject(airports);
+          expect(res.statusCode).toEqual(200);
+          expect(res.body).toMatchObject(aptToDelete);
+        });
+        it('should send 403 to normal user and not delete departure', async () => { 
+          const res = await request(server)
+            .delete("/airports/" + aptToDelete.ICAO)
+            .set('Authorization', 'Bearer ' + token0)
+            .send({});
+          expect(res.statusCode).toEqual(403);
+        });
+        it('should send 200 to an admin and delete departure', async () => {
+          const aptICAO = aptToDelete.ICAO
+          const res = await request(server)
+            .delete("/airports/" + aptICAO)
+            .set('Authorization', 'Bearer ' + adminToken)
+            .send({});
+          expect(res.statusCode).toEqual(200);
+          const storedAirport = await Airports.findOne({aptICAO});
+          expect(storedAirport).toBeNull();
+        });
       });
     });
   });
-});
 
 })

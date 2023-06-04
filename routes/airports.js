@@ -66,4 +66,17 @@ router.get("/:ICAO", async (req, res, next) => {
     }
 });
 
+router.delete("/:ICAO", isAdmin, async (req, res, next) => {
+    try {
+        const icaoCode = req.params.ICAO;;
+        const success = await airportsDAO.deleteByCode(icaoCode);
+        res.sendStatus(success ? 200 : 400);
+        return res.json();
+    } catch(e) {
+        res.status(500).send(e.message)
+        next(e)
+    }
+});
+
+
 module.exports = router;
