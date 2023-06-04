@@ -4,7 +4,7 @@ const departuresSchema = new mongoose.Schema({
   ICAO: { type: String},  
   CLIMB: { type: String },
   EXPECT_CRUISE: { type: String },
-  LAST_UPDATED:{ type: String },
+  UPDATED:{ type: String },
   NAME: {type: String},
   NEED_FOR_INTERIM_ALT: {type: String},
   NUM:  { type: Number },
