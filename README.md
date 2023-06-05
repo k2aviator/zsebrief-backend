@@ -3,7 +3,7 @@
 My goal is to replace the current backend for my [ZSEBrief](http://zsebrief.com) website application (which I developed in the second course) with a more advanced backend using what I have learned with Express and MongoDB Atlas in this third course. My objective is to not only use this backend to display information, but to also allow users with certain permissions the ability to update information in the backend. The project will include:
 * Authentication and authorization with admin roles to update database or viewer roles
 * 2 sets of CRUD routes for updating information in airports and departures databases (the third CRUD for runways is time permitting)
-* (TBD) Text search and/or aggregation 
+* Data aggregation and look up for departures based on an airport's airspace class
 * Unit tests to make functionality works
 
 ## Timeline
