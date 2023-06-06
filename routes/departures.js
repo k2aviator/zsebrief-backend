@@ -50,7 +50,6 @@ router.put("/:id", isAdmin, async (req, res, next) => {
         const departureId = req.params.id;
         const userEmail = req.user.email
         const departureDetails = req.body
-        console.log("user email is  ", userEmail)
         const updatedDeparture = await departuresDAO.updateDeparture(departureDetails, userEmail, departureId)
         //console.log("updated airport returned is ", updatedDeparture)
         return res.json(updatedDeparture);

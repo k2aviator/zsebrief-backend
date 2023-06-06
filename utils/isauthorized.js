@@ -1,7 +1,4 @@
 //const mongoose = require('mongoose');
-
-module.exports = {};
-
 const userDAO = require('../daos/user');
 const jwt = require('jsonwebtoken')
 const secret = 'Harraseeket'

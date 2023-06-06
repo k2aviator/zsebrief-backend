@@ -8,8 +8,7 @@ router.use("/airports", require('./airports'));
 router.use("/departures", require('./departures'));
 router.use("/runways", require('./runways'));
 router.use("/login", require('./login'));
-
-
+router.use("/admin", require('./admin'))
 
 router.get("/", (req, res, next) => {
   res.send(`
