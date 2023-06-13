@@ -42,6 +42,19 @@ describe("/airports", () => {
     TOWERED: "TRUE",
     UPDATED_BY: "user1@gmail.com"
   }
+  const invalidAirport = {
+    AIRSPACE_CLASS: 1, // 123 // PROVIDED A NUMBER VERSUS A STRING 
+    ELEV: 123, //PROVIDED A STRING AND NOT A NUMBER
+    HRS_CLOSE: 999,
+    HRS_OPEN: 9999,
+    ICAO: "KCVO", // SHOULD BE STRING
+    LAT: "44.4968758",
+    LONG: "-123.2894572",
+    NAME: "Corvallis Municipal Airport",
+    NOTES: "",
+    TOWERED: "TRUE", // SHOULD BE TRUE / FALSE
+    UPDATED_BY: "user1@gmail.com"
+  };
   describe('After login', () => {
     const user0 = {
       email: 'user0@gmail.com',
@@ -81,6 +94,28 @@ describe("/airports", () => {
         const savedAirport = await Airports.findOne({ _id: res.body._id }).lean();
         expect(savedAirport).toMatchObject(airport);
       });
+      it('should not store an empty airport', async () => {
+        const res = await request(server)
+          .post("/airports/" + airport.ICAO)
+          .set('Authorization', 'Bearer ' + adminToken)
+          .send({});
+        expect(res.statusCode).toEqual(400);
+        const savedAirport = await Airports.find().lean();
+        expect(savedAirport.length).toEqual(0);
+      });
+      it.each(Object.keys(invalidAirport))('should return 400 if %s is not provided', async (key) =>{
+        const airportMissingKeys = {
+        ...invalidAirport,
+        [key]: undefined
+        } 
+        const res = await request(server)
+        .post("/airports/" + airport.ICAO)
+        .set('Authorization', 'Bearer ' + adminToken)
+        .send(airportMissingKeys);
+        expect(res.statusCode).toEqual(400);
+        const savedAirport = await Airports.find().lean();
+        expect(savedAirport.length).toEqual(0);        
+      })          
     describe.each([airport0, airport1])("PUT / airport %#", (airport) => {
       let originalAirportItem;
       beforeEach(async () => {
@@ -113,8 +148,6 @@ describe("/airports", () => {
         expect(savedAirport).toMatchObject(updatedAirport);
       });
     });
-
-
     describe.each([airport0, airport1])("GET /:ICAO airport %#", (airport) => {
       let originalAirport;
       beforeEach(async () => {

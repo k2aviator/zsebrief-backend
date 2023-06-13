@@ -1,12 +1,11 @@
 const { Router } = require("express");
 const router = Router();
 const isAdmin = require('../utils/isadmin.js');
+const validateAirportFields = require('../utils/airportValidateData.js');
 const airportsDAO = require('../daos/airports');
 const userDAO = require('../daos/user');
 const jwt = require('jsonwebtoken')
 const secret = 'Harraseeket'
-
-
 
 
 
@@ -19,14 +18,20 @@ router.get("/", async (req, res, next) => {
     }
 })
 
-router.post("/:ICAO", isAdmin, async (req, res, next) => {
+router.post("/:ICAO", validateAirportFields, isAdmin, async (req, res, next) => {
     try{
     const airportDetails = req.body;
-    // console.log("POST FUNCTION")z
-    // console.log("airport details are ", airportDetails)
-    // console.log("request user is ", req.user)
-    const createdAirport = await airportsDAO.create(airportDetails);
-    res.json(createdAirport);
+    const airportMissing = Object.keys(airportDetails).length === 0
+    //console.log("POST FUNCTION")
+    if (airportMissing){     
+        //console.log("airport is missing from body, return 400")
+        res.sendStatus(400);
+    } else {
+        //console.log("airport details are ", airportDetails, " create airport")
+        const createdAirport = await airportsDAO.create(airportDetails);
+        res.json(createdAirport);
+    }
+  
     }catch(e) {
         next(e)
     }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const departuresSchema = new mongoose.Schema({
-  ICAO: { type: String},  
+  ICAO: { type: String, index:true, required: true},  
   CLIMB: { type: String },
   EXPECT_CRUISE: { type: String },
   UPDATED:{ type: String },
@@ -12,6 +12,7 @@ const departuresSchema = new mongoose.Schema({
   RWY_SPECIFIC: {type: String },
   TOP_ALT: {type: String },
   TOP_ALT_LISTED:  {type: String },
+  TOP_ALT_STATE:  {type: String },
   TYPE: { type: String },
   UPDATED_BY: { type: String }
 });

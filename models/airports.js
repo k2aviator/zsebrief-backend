@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const airportsSchema = new mongoose.Schema({
-  ICAO: { type: String, index:true},
-  AIRSPACE_CLASS: { type: String },
+  ICAO: { type: String, index:true, required: true},
+  AIRSPACE_CLASS: { type: String, required: true },
   ELEV: { type: Number },
   HRS_CLOSE:{ type: Number },
   HRS_OPEN:{ type: Number },

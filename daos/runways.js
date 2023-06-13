@@ -15,10 +15,10 @@ module.exports.getAll = async () => {
     return runways;
 }
 
-// module.exports.getById = async (airportId) => {
-//     const airport = await Item.findOne({ _id: airportId }).lean();
-//     return airport;
-// }
+module.exports.getListByCode = async (airportCode) => {
+    const runways = await Runways.find({ ICAO: airportCode }, {RUNWAY:1}).lean();
+    return runways;
+}
 
 
 //BELOW FOR MATCHING STRINGS
