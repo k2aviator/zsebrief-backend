@@ -43,18 +43,34 @@ describe("/airports", () => {
     UPDATED_BY: "user1@gmail.com"
   }
   const invalidAirport = {
-    AIRSPACE_CLASS: 1, // 123 // PROVIDED A NUMBER VERSUS A STRING 
-    ELEV: 123, //PROVIDED A STRING AND NOT A NUMBER
-    HRS_CLOSE: 999,
-    HRS_OPEN: 9999,
-    ICAO: "KCVO", // SHOULD BE STRING
-    LAT: "44.4968758",
-    LONG: "-123.2894572",
-    NAME: "Corvallis Municipal Airport",
-    NOTES: "",
-    TOWERED: "TRUE", // SHOULD BE TRUE / FALSE
-    UPDATED_BY: "user1@gmail.com"
+    AIRSPACE_CLASS: 12345,
+    ELEV: 'not a number',
+    HRS_CLOSE: 'not a number',
+    HRS_OPEN: 'not a number',
+    ICAO: 12345,
+    LAT: 12345,
+    LONG: 12345,
+    NAME: 12345,
+    NOTES: 12345,
+    TOWERED: 12345,
+    UPDATED_BY: 12345,
   };
+  const invalidAirportStrings = {
+    AIRSPACE_CLASS: 12345,
+    ICAO: 12345,
+    LAT: 12345,
+    LONG: 12345,
+    NAME: 12345,
+    NOTES: 12345,
+    TOWERED: 12345,
+    UPDATED_BY: 12345,
+  };
+  const invalidAirportNumbers = {
+    ELEV: 'not a number',
+    HRS_CLOSE: 'not a number',
+    HRS_OPEN: 'not a number',
+  };
+  
   describe('After login', () => {
     const user0 = {
       email: 'user0@gmail.com',
@@ -115,7 +131,21 @@ describe("/airports", () => {
         expect(res.statusCode).toEqual(400);
         const savedAirport = await Airports.find().lean();
         expect(savedAirport.length).toEqual(0);        
-      })          
+      })     
+      it.each(Object.entries(invalidAirportStrings))('should have string value for key %s', async (key, value) => {
+        const res = await request(server)
+        .post("/airports/" + airport.ICAO)
+        .set('Authorization', 'Bearer ' + adminToken)
+        .send(invalidAirportStrings);
+        expect(res.statusCode).toEqual(400);    
+      });       
+      it.each(Object.entries(invalidAirportNumbers))('should have number value for key %s', async (key, value) => {
+        const res = await request(server)
+        .post("/airports/" + airport.ICAO)
+        .set('Authorization', 'Bearer ' + adminToken)
+        .send(invalidAirportNumbers);
+        expect(res.statusCode).toEqual(400);    
+      });       
     describe.each([airport0, airport1])("PUT / airport %#", (airport) => {
       let originalAirportItem;
       beforeEach(async () => {

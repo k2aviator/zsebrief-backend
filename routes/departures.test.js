@@ -23,6 +23,7 @@ describe("/departures", () => {
     "RWY_SPECIFIC":"",
     "TOP_ALT":"2000 (DON'T STATE)",
     "TOP_ALT_LISTED":"YES",
+    "TOP_ALT_STATE":"NO",
     "TYPE": "R/V"
    }
 
@@ -37,6 +38,7 @@ describe("/departures", () => {
     "RWY_SPECIFIC":"",
     "TOP_ALT":"4000",
     "TOP_ALT_LISTED":"NO",
+    "TOP_ALT_STATE":"YES",
     "TYPE":"RNAV"
     }
 
@@ -80,6 +82,19 @@ describe("/departures", () => {
       const savedDeparture = await Departures.findOne({ _id: res.body._id }).lean();
       expect(savedDeparture).toMatchObject(departure);
     });
+    it.each(Object.keys(departure1))('should return 400 if %s is not provided', async (key) =>{
+      const departureMissingKeys = {
+      ...departure1,
+      [key]: undefined
+      } 
+      const res = await request(server)
+      .post("/departures")
+      .set('Authorization', 'Bearer ' + adminToken)
+      .send(departureMissingKeys);
+      expect(res.statusCode).toEqual(400);
+      const savedDeparture = await Departures.find().lean();
+      expect(savedDeparture.length).toEqual(0);        
+    })  
 
   });
   describe('GET /', () => {

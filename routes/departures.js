@@ -1,11 +1,12 @@
 const { Router } = require("express");
 const router = Router();
 const isAdmin = require('../utils/isadmin.js');
+const validateDepartureFields = require('../utils/departuresValidateData.js');
 const departuresDAO = require('../daos/departures');
 const jwt = require('jsonwebtoken')
 const secret = 'Harraseeket'
 
-router.post("/", isAdmin, async (req, res, next) => {
+router.post("/", isAdmin, validateDepartureFields, async (req, res, next) => {
     try{
     const departureDetails = req.body;
     // console.log("airport details are ", airportDetails)
@@ -32,6 +33,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
     //console.log("get by departure ID")
     const depId = req.params.id;
+    //console.log("request params id is ", depId )
     const departure = await departuresDAO.getById(depId);
     if (departure) {
         res.json(departure);

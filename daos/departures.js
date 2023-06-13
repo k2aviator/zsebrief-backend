@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 const Departures = require('../models/departures');
 
@@ -17,9 +18,9 @@ module.exports.getAll = async () => {
 }
 
 module.exports.getById = async (depId) => {
-    //console.log("Departures get by ID in DAO... dep id to search for ", depId)
+    console.log("Departures get by ID in DAO... dep id to search for ", depId)
     const dep = await Departures.findOne({ _id: depId }).lean();
-    //console.log("returned departure in DAO function ", dep)
+    console.log("returned departure in DAO function ", dep)
     return dep;
 }
 
