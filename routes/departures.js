@@ -6,7 +6,7 @@ const departuresDAO = require('../daos/departures');
 const jwt = require('jsonwebtoken')
 const secret = 'Harraseeket'
 
-router.post("/", isAdmin, validateDepartureFields, async (req, res, next) => {
+router.post("/", isAdmin, async (req, res, next) => {
     try{
     const departureDetails = req.body;
     // console.log("airport details are ", airportDetails)
