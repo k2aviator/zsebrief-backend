@@ -5,7 +5,7 @@ const runwaysSchema = new mongoose.Schema({
     CALM_WIND_THRESHOLD:{ type: String},
     DVA:{ type: String},
     IAP:{ type: String},
-    ICAO:{ type: String},
+    ICAO:{ type: String, required: true},
     LENGTH_FT:{ type: Number },
     MAG_HEADING: { type: Number },
     ODP:{ type: String},

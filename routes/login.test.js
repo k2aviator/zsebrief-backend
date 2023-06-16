@@ -18,7 +18,8 @@ describe("/login", () => {
   };
   const user1 = {
     email: 'user1@mail.com',
-    password: '456password'
+    password: '456password',
+    roles: 'admin'
   }
 
   describe("before signup", () => {
@@ -181,7 +182,13 @@ describe("/login", () => {
         });
         expect(loginRes1.statusCode).toEqual(200);
       });
-     
+      it("should return user role (non admin) for user 1", async () => {
+        const res = await request(server)
+          .post("/login/isadmin")
+          .set('Authorization', 'Bearer ' + token1)
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.admin).toEqual(false)
+      });
     });
   });
 });

@@ -70,7 +70,6 @@ router.delete("/:id", isAdmin, async (req, res, next) => {
         res.sendStatus(success ? 200 : 400);
         return res.json();
     } catch(e) {
-        res.status(500).send(e.message)
         next(e)
     }
 });

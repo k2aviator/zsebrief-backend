@@ -16,40 +16,47 @@ module.exports.getAll = async () => {
 }
 
 module.exports.getListByCode = async (airportCode) => {
+    //const runways = await Runways.find().lean();
     const runways = await Runways.find({ ICAO: airportCode }, {RUNWAY:1}).lean();
+    // console.log("DAO GET - found runways ", runways)
     return runways;
 }
 
 
-//BELOW FOR MATCHING STRINGS
+module.exports.create = async (runwayDetails) => {
+    const runway = await Runways.create(runwayDetails);
+    return runway;
+  }
 
-// module.exports.updateAirports = async () => {
-//     //console.log("DAO  - update items")
-//     const updatedAirports = await Airports.updateMany(
-//         {  HRS_OPEN: { $regex: /NA/ } },
-//         {  $set: { HRS_OPEN: '9999' } }
-//     );
-//     return updatedAirports;
-// }
 
-//ABOVE FOR MATCHING STRINGS
 
-//BELOW FOR CHANGING DATA TYPES
+  
+module.exports.updateRunway = async (runwayDetails, userEmail, runwayId) => {
 
-// module.exports.updateAirports = async () => {
-//     //console.log("DAO  - update items")
-//     const updatedAirports = await Airports.updateMany({},[
-//     {     
-//         $set: {
-//             HRS_OPEN: {
-//                 $toInt: "$HRS_OPEN"
-//                 }
-//         }
-        
-//     }
+    const airportICAO = runwayDetails.ICAO;
+    const departureUpdated = new Date();
+  
+    const updateQuery = { _id: runwayId };
+  
+    runwayDetails.UPDATED_BY = userEmail;
+    runwayDetails.UPDATED = departureUpdated;
+ 
+    
+    delete runwayDetails._id;
+    
+    const updatedRunway = await Runways.updateOne(updateQuery, runwayDetails);
+    const results = updatedRunway.acknowledged;
 
-//     ]);
-//     return updatedAirports;
-// }
+    const retreiveUpdatedRunway = await Runways.findOne({ _id: runwayId }).lean();
 
-//ABOVE FOR CHANGING DATA TYPES
+    if (results === true || results === "true") {
+      return retreiveUpdatedRunway;
+    }
+  };
+
+
+
+  module.exports.deleteById = async (runwayId) => {
+    await Runways.deleteOne({ _id: runwayId });
+    return true;
+  }

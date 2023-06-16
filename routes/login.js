@@ -68,12 +68,11 @@ router.post("/isadmin", async(req, res, next) => {
         //console.log("token in is admin function is ", token)
         const verifyUserId = jwt.verify(token, secret)
         const userId = verifyUserId._id
-        // console.log("verified user id is ", verifyUserId, " user id is ", userId)
+        //console.log("verified user id is ", verifyUserId, " user id is ", userId)
         const isAdmin = await userDAO.getRoleByUserId(userId)
         //console.log("is admin result ", isAdmin)
         return res.json({"admin":isAdmin})
     } catch(e) {  
-        console.log(e)
         next(e)
     }
 

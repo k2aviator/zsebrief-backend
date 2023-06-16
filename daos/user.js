@@ -23,15 +23,6 @@ module.exports.getUser = async (userName) => {
     }
 }
 
-module.exports.getUserById = async (userId) => {
-    const userRecord = await Users.find({_id:userId})
-    if (userRecord.length == 0) {
-        return false
-    } else {
-        return userRecord[0]
-    }
-}
-
 module.exports.getRoleByUserId = async (userId) => {
     const userRecord = await Users.find({_id:userId}).lean()
     const userRole = userRecord[0].roles
