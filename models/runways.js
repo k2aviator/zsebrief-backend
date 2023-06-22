@@ -13,7 +13,8 @@ const runwaysSchema = new mongoose.Schema({
     TRAFFIC_PATTERN:{ type: String},
     TRUE_HEADING:{ type: Number },
     UPDATED: { type: String},
-    WIDTH_FT:{ type: Number }
+    WIDTH_FT:{ type: Number },
+    UPDATED_BY: { type: String }
 });
 
 

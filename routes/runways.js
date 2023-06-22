@@ -28,6 +28,17 @@ router.get("/", async (req, res, next) => {
     }
 })
 
+router.get("/:id", async (req, res, next) => {
+    const runwayId = req.params.id;
+    //console.log("request params id is ", depId )
+    const runway = await runwaysDAO.getById(runwayId);
+    if (runway) {
+        return res.json(runway);
+    } else {
+        res.sendStatus(404);
+    }
+})
+
 router.get("/numbers/:ICAO", async (req, res, next) => {
     const airportCode = req.params.ICAO;
     // console.log("Route... airport ICAO passed through ", airportCode)

@@ -15,6 +15,14 @@ module.exports.getAll = async () => {
     return runways;
 }
 
+
+
+module.exports.getById = async (runwayId) => {
+  const rwy = await Runways.findOne({ _id: runwayId }).lean();
+  return rwy;
+}
+
+
 module.exports.getListByCode = async (airportCode) => {
     //const runways = await Runways.find().lean();
     const runways = await Runways.find({ ICAO: airportCode }, {RUNWAY:1}).lean();
