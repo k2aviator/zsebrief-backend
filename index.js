@@ -1,7 +1,7 @@
 const server = require("./server");
 const mongoose = require('mongoose');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const mongoURL = process.env.MONGO_CONNECTION_STRING || 'mongodb+srv://api_two:WNnz86COLGh5oUbB@cluster0.1vnkun2.mongodb.net/ZSEBRIEF?retryWrites=true&w=majority'
 
 //api_two

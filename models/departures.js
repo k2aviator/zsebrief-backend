@@ -14,6 +14,7 @@ const departuresSchema = new mongoose.Schema({
   TOP_ALT_LISTED:  {type: String },
   TOP_ALT_STATE:  {type: String },
   TYPE: { type: String },
+  NOTES: { type: String },
   UPDATED_BY: { type: String }
 });
 
