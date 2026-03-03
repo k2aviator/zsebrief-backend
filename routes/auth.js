@@ -63,7 +63,17 @@ router.post("/vatsim/exchange", async (req, res) => {
     */
     let user = await User.findOne({ cid });
 
-    if (!user) {
+if (!user) {
+  // Try finding by email (legacy user)
+  user = await User.findOne({ email });
+    if (user) {
+      // Update existing user with VATSIM info
+      user.cid = cid;
+      user.authProvider = "vatsim";
+      user.rating = rating;
+      await user.save();
+    } else {
+      // Create completely new user
       user = await User.create({
         cid,
         email,
@@ -72,6 +82,7 @@ router.post("/vatsim/exchange", async (req, res) => {
         roles: ["user"],
         authProvider: "vatsim"
       });
+    }
     }
 
     /*
