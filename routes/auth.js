@@ -5,24 +5,21 @@ const User = require("../models/user");
 
 const router = Router();
 
-/**
- * VATSIM OAuth Callback
- */
-router.get("/vatsim/callback", async (req, res) => {
-  const { code, state } = req.query;
+/*
+  POST /auth/vatsim/exchange
+  Body: { code: "AUTH_CODE_FROM_VATSIM" }
+*/
+router.post("/vatsim/exchange", async (req, res) => {
+  const { code } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: "Missing authorization code" });
   }
 
   try {
-    const baseURL = process.env.VATSIM_BASE_URL; // dev or prod
-
-    if (!baseURL) {
-      throw new Error("VATSIM_BASE_URL not configured");
-    }
-
-    // 🔁 Exchange authorization code for access token
+    /*
+      1️⃣ Exchange authorization code for VATSIM access token
+    */
     const params = new URLSearchParams();
     params.append("grant_type", "authorization_code");
     params.append("client_id", process.env.VATSIM_CLIENT_ID);
@@ -30,8 +27,8 @@ router.get("/vatsim/callback", async (req, res) => {
     params.append("redirect_uri", process.env.VATSIM_REDIRECT_URI);
     params.append("code", code);
 
-    const tokenResponse = await axios.post(
-      `${baseURL}/oauth/token`,
+      const tokenResponse = await axios.post(
+      `${process.env.VATSIM_BASE_URL}/oauth/token`,
       params,
       {
         headers: {
@@ -42,49 +39,46 @@ router.get("/vatsim/callback", async (req, res) => {
 
     const accessToken = tokenResponse.data.access_token;
 
-    if (!accessToken) {
-      throw new Error("No access token received from VATSIM");
-    }
-
-    // 👤 Fetch user info from VATSIM
     const userResponse = await axios.get(
-      `${baseURL}/api/user`,
+      `${process.env.VATSIM_BASE_URL}/api/user`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
       }
     );
-
     const vatsimUser = userResponse.data.data;
 
     if (!vatsimUser) {
-      throw new Error("No user data returned from VATSIM");
+      return res.status(500).json({ error: "No user data returned" });
     }
 
     const cid = vatsimUser.cid;
-    const fullName = vatsimUser.personal?.name_full || "";
-    const email = vatsimUser.personal?.email || "";
-    const rating = vatsimUser.vatsim?.rating?.long || "";
+    const fullName = vatsimUser.personal?.name_full;
+    const email = vatsimUser.personal?.email;
+    const rating = vatsimUser.vatsim?.rating?.long;
 
-    // 🔎 Find or create user in MongoDB
+    /*
+      3️⃣ Find or create user in MongoDB
+    */
     let user = await User.findOne({ cid });
 
     if (!user) {
       user = await User.create({
         cid,
-        fullName,
         email,
+        fullName,
         rating,
-        roles: ["user"],
-        authProvider: "vatsim"
+        roles: ["user"]
       });
     }
 
-    // 🔐 Create JWT for your app
+    /*
+      4️⃣ Create YOUR app JWT
+    */
     const appToken = jwt.sign(
       {
-        id: user._id,
+        _id: user._id,
         cid: user.cid,
         roles: user.roles
       },
@@ -92,16 +86,14 @@ router.get("/vatsim/callback", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // 🔄 Redirect back to frontend
-    res.redirect(
-      `${process.env.FRONTEND_URL}/oauth-success?token=${appToken}`
-    );
+    /*
+      5️⃣ Return token to frontend
+    */
+    return res.json({ token: appToken });
 
   } catch (err) {
-    console.error("OAuth Error:", err.response?.data || err.message);
-    res.status(500).json(
-      err.response?.data || { error: "VATSIM OAuth failed" }
-    );
+    console.error("OAuth exchange error:", err.response?.data || err.message);
+    return res.status(500).json({ error: "OAuth exchange failed" });
   }
 });
 
