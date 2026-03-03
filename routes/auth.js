@@ -69,7 +69,8 @@ router.post("/vatsim/exchange", async (req, res) => {
         email,
         fullName,
         rating,
-        roles: ["user"]
+        roles: ["user"],
+        authProvider: "vatsim"
       });
     }
 
