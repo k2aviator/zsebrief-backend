@@ -4,8 +4,6 @@ const isAdmin = require('../utils/isadmin.js');
 //const adminDAO = require('../daos/admin.js');
 const userDAO = require('../daos/user');
 const adminDAO = require('../daos/admin');
-const jwt = require('jsonwebtoken')
-const secret = 'Harraseeket'
 
 
 router.get("/deps-by-class/:aptClass", async (req, res, next) => {

@@ -4,8 +4,6 @@ const router = Router();
 const isAdmin = require('../utils/isadmin.js');
 const runwaysDAO = require('../daos/runways');
 const jwt = require('jsonwebtoken')
-const secret = 'Harraseeket'
-
 
 router.post("/", isAdmin, async (req, res, next) => {
     try{
@@ -54,7 +52,7 @@ router.put("/:id", isAdmin, async (req, res, next) => {
     try {
         let token = req.headers.authorization
         token = token.replace('Bearer ', '')
-        const verifyUserId = jwt.verify(token, secret)
+       const verifyUserId = jwt.verify(token, process.env.JWT_SECRET)
         req.user = verifyUserId
         const runwayId = req.params.id;
         const userEmail = req.user.email

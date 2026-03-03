@@ -4,7 +4,6 @@ const isAdmin = require('../utils/isadmin.js');
 const validateDepartureFields = require('../utils/departuresValidateData.js');
 const departuresDAO = require('../daos/departures');
 const jwt = require('jsonwebtoken')
-const secret = 'Harraseeket'
 
 router.post("/", isAdmin, async (req, res, next) => {
     try{
@@ -47,7 +46,7 @@ router.put("/:id", isAdmin, async (req, res, next) => {
         // console.log("departures PUT route")
         let token = req.headers.authorization
         token = token.replace('Bearer ', '')
-        const verifyUserId = jwt.verify(token, secret)
+        const verifyUserId = jwt.verify(token, process.env.JWT_SECRET)
         req.user = verifyUserId
         const departureId = req.params.id;
         const userEmail = req.user.email
