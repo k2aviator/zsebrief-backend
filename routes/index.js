@@ -1,6 +1,4 @@
-require("dotenv").config({
-  path: `.env.${process.env.NODE_ENV || "development"}`
-});
+
 const { Router } = require("express");
 const router = Router();
 const cors = require('cors')

@@ -1,45 +1,35 @@
-const userDAO = require('../daos/user');
-const jwt = require('jsonwebtoken')
-const secret = 'Harraseeket'
+const jwt = require('jsonwebtoken');
 
-const isAdmin = async (req,res,next) => {
+const isAdmin = async (req, res, next) => {
     try {
-        //console.log("is admin function")
-        let token = req.headers.authorization
-        //console.log("request token is ", token )
-        if (!token || !token.indexOf('Bearer ') === 0 ){ 
-            //console.log("ADMIN function: token not present - send 401")
-            res.status(401).send("Token not present")
-        } else {
-            
-            token = token.replace('Bearer ', '')
-            //console.log("token is valid ", token)
-            try {
-                const verifyUserId = jwt.verify(token, secret)
-                const userRoles = verifyUserId.roles
-                const isAdmin = userRoles.includes('admin')
-                if (isAdmin){
-                    //console.log('ADMIN function: is admin - next: req url', req.url, ' method', req.method)
-                    //console.log("user roles is ", userRoles)
-                    //console.log('user is admin ', isAdmin)
-                    next()
-                } else {
-                    //console.log('ADMIN function: not an admin - send 403 : req url', req.url, ' method', req.method)
-                    //console.log("user roles is ", userRoles)
-                    //console.log('user is admin ', isAdmin)
-                    res.status(403).send()
-                }
-            } catch(e){
-                //console.log("invalid token - send 401")
-                res.status(401).send("invalid token")
-                next(e)
-            }
-           
-        }
-    } catch (e) {
-        //console.log(e)
-        next(e)
-    }
+        const authHeader = req.headers.authorization;
 
-}
+        // console.log("Authorization header:", authHeader);
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).send("Token missing");
+        }
+
+        // 👇 THIS is the important line
+        const token = authHeader.split(' ')[1];
+
+        // console.log("Token being verified:", token);
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // console.log("JWT_SECRET:", process.env.JWT_SECRET);
+        // console.log("Decoded token:", decoded);
+        if (!decoded.roles || !decoded.roles.includes('admin')) {
+            return res.status(403).send("Not authorized");
+        }
+
+        req.user = decoded;
+        return next();
+
+    } catch (err) {
+        console.log("JWT verify error:", err.message);
+        return res.status(401).send("Invalid token");
+    }
+};
+
 module.exports = isAdmin;

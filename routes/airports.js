@@ -5,8 +5,7 @@ const validateAirportFields = require('../utils/airportValidateData.js');
 const airportsDAO = require('../daos/airports');
 const userDAO = require('../daos/user');
 const jwt = require('jsonwebtoken')
-const secret = 'Harraseeket'
-
+const secret = process.env.JWT_SECRET
 
 
 router.get("/", async (req, res, next) => {
@@ -41,20 +40,15 @@ router.post("/:ICAO", validateAirportFields, isAdmin, async (req, res, next) => 
 //Need to add back isAdmin function
 router.put("/:ICAO", isAdmin, async (req, res, next) => {
     try {
-        // console.log("AIRPORT PUT ROUTE")
-        let token = req.headers.authorization
-        token = token.replace('Bearer ', '')
-        const verifyUserId = jwt.verify(token, secret)
-        req.user = verifyUserId
-        const userEmail = req.user.email
-        //console.log("user is ", userEmail)
-        const airportDetails = req.body
-        //console.log("request body is ", airportDetails)
-        const updatedAirport = await airportsDAO.updateAirport(airportDetails, userEmail)
-        // console.log("updated airport returned is ", updatedAirport)
+        const userEmail = req.user.email; // Already set by isAdmin
+        const airportDetails = req.body;
+
+        const updatedAirport = await airportsDAO.updateAirport(airportDetails, userEmail);
+
         return res.json(updatedAirport);
+
     } catch(e) {
-        next(e)
+        next(e);
     }
 });
 

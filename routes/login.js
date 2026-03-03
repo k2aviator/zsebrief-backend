@@ -1,73 +1,95 @@
 const { Router } = require("express");
-const router = Router()
-const userDAO = require('../daos/user');
-const jwt = require('jsonwebtoken')
+const router = Router();
+const userDAO = require("../daos/user");
+const jwt = require("jsonwebtoken");
 
-
-router.use(async (req,res,next) => {
-    try {
-        let token = req.headers.authorization
-        if (!token || !token.indexOf('Bearer ') === 0 ){ 
-            //console.log('not authorized: req url', req.url, ' token? ', token, ' method', req.method)
-            if (req.url === "/logout" && req.method === "POST"){
-                res.status(404).send("Post before logout, send 404")
-            } else if (req.method === "POST" && !req.body.password){
-                res.status(400).send("No password")
-            } else if (req.url === "/password" && req.method === "POST"){
-                res.status(401).send("No password")
-            } else {
-                next()
-            }          
-        } else {
-            //console.log('is authorized: req url', req.url, ' token? ', token, ' method', req.method)
-            token = token.replace('Bearer ', '')
-            try {
-                const verifyUserId = jwt.verify(token, process.env.JWT_SECRET)
-                //console.log("verified user information for login function ", verifyUserId)
-                req.user = verifyUserId
-                next()
-            } catch(e){
-                res.status(401).send("invalid token")
-                next(e)
-            }
-           
-        }
-    } catch (e) {
-        next(e)
-    }
-})
-
+/*
+========================================
+SIGNUP
+========================================
+*/
 router.post("/signup", async (req, res, next) => {
-    try {
-        //console.log("Sign up function")
-        //console.log("sign up route request body ", req.body, "request user is ", req.user, " request params", req.params)
-        if (req.body.email && req.body.password){
-        const findUser = await userDAO.getUser(req.body.email)
-        //console.log("find user is", findUser)
-            if (!findUser === false){
-                //console.log("user already exists, send 409")
-                return res.status(409).send("user already exists - send 409")
-            } else {  
-                const hashedPass = await userDAO.hashPassword(req.body.password)
-                const newUser = await userDAO.createUser(req.body.email, hashedPass)
-                //console.log("new user is ", newUser)
-                return res.json({newUser})
-            }
-        }    
-    } catch(e) {
-        next(e)
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send("Missing email or password");
     }
+
+    const existingUser = await userDAO.getUser(email);
+
+    if (existingUser) {
+      return res.status(409).send("User already exists");
+    }
+
+    const hashedPass = await userDAO.hashPassword(password);
+    const newUser = await userDAO.createUser(email, hashedPass);
+
+    return res.json({ newUser });
+
+  } catch (err) {
+    next(err);
+  }
 });
 
+
+/*
+========================================
+LOGIN
+========================================
+*/
+router.post("/", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send("Missing credentials");
+    }
+
+    const user = await userDAO.getUser(email);
+
+    if (!user) {
+      return res.status(401).send("User does not exist");
+    }
+
+    const passwordValid = await userDAO.checkPassword(email, password);
+
+    if (!passwordValid) {
+      return res.status(401).send("Invalid password");
+    }
+
+    const token = jwt.sign(
+      {
+        email: user.email,
+        _id: user._id,
+        roles: user.roles,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({ token });
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+/*
+========================================
+CHECK ADMIN
+========================================
+*/
 router.post("/isadmin", (req, res) => {
   try {
-    let token = req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
-    if (!token || !token.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ admin: false });
     }
 
-    token = token.replace("Bearer ", "");
+    const token = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -82,82 +104,44 @@ router.post("/isadmin", (req, res) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
-    try {
-    //console.log("post request body" , req.body)
-    //console.log(req.headers)
-    const userEmail = req.body.email
-    const userPassword = req.body.password
-    if (!userPassword){
-        return res.status(400).send("") 
-    }
-    const findUser = await userDAO.getUser(req.body.email)
-    //console.log("returned find user is ", findUser)
-    if (!findUser == false){
-        if(!req.body.password){
-            return res.status(400).send("no password provided") 
-        } else {
-            const checkPass = await userDAO.checkPassword(req.body.email, req.body.password)
-            if (checkPass == true){
-                //console.log("find user is ", findUser)
-                const userId = findUser._id
-                const userEmail = findUser.email
-                const userRoles = findUser.roles
-                //console.log("request user is ", req.user)
-                //console.log("user id is ", userId, " user email is ", userEmail, " and user role is ", userRoles)
-                //let token = jwt.sign({email: userEmail,_id: userId, roles:['user']}, secret)
-                let token = jwt.sign(
-                    { email: userEmail, _id: userId, roles: userRoles },
-                    process.env.JWT_SECRET,
-                    { expiresIn: "7d" }
-                );         
-                req.headers.authorization = token
-                //console.log("returned token is ", token)
-                return res.json({token})
-            } else {
-                //console.log("401 error")
-                return res.status(401).send("") 
-            }
-        }
-   
-    } else {
-        //console.log("RETURN user doesn't exist")
-        return res.status(401).send("user doesn't exist")
-    }     
-     
-    } catch(e) {  
-        // console.log(e)
-        next(e)
-    }
-});
 
-
+/*
+========================================
+UPDATE PASSWORD
+========================================
+*/
 router.post("/password", async (req, res, next) => {
-    try {
-        //console.log('POST PASS FUNCTION')
-        const bodyPassword = req.body.password
-        const userId = req.user._id
-        if (!bodyPassword){
-            res.status(400).send("no password provided")
-        } else {
-            const hashedPass = await userDAO.hashPassword(bodyPassword)
-            const updatedPassword = await userDAO.updateUserPassword(userId, hashedPass)
-            if (updatedPassword === true){
-                //console.log("POST PASS - password updated to  ", bodyPassword, " send status 200")
-                return res.status(200).send("updated password")
-            } 
-            // else {
-            //     //console.log("POST PASS - unable to update password ", updatedPassword)
-            //     return res.status(401).send("")
-            // }
-        }
-        next()
-    } catch(e) {
-        // console.log(e)
-        next(e)
-    }
-});
+  try {
+    const authHeader = req.headers.authorization;
 
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Token missing");
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).send("No password provided");
+    }
+
+    const hashedPass = await userDAO.hashPassword(password);
+
+    const updated = await userDAO.updateUserPassword(decoded._id, hashedPass);
+
+    if (!updated) {
+      return res.status(500).send("Password update failed");
+    }
+
+    return res.status(200).send("Password updated");
+
+  } catch (err) {
+    return res.status(401).send("Invalid token");
+  }
+});
 
 
 module.exports = router;
