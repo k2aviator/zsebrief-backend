@@ -2,7 +2,6 @@ const { Router } = require("express");
 const router = Router()
 const userDAO = require('../daos/user');
 const jwt = require('jsonwebtoken')
-const secret = 'Harraseeket'
 
 
 router.use(async (req,res,next) => {
@@ -23,7 +22,7 @@ router.use(async (req,res,next) => {
             //console.log('is authorized: req url', req.url, ' token? ', token, ' method', req.method)
             token = token.replace('Bearer ', '')
             try {
-                const verifyUserId = jwt.verify(token, secret)
+                const verifyUserId = jwt.verify(token, process.env.JWT_SECRET)
                 //console.log("verified user information for login function ", verifyUserId)
                 req.user = verifyUserId
                 next()
@@ -60,22 +59,27 @@ router.post("/signup", async (req, res, next) => {
     }
 });
 
-router.post("/isadmin", async(req, res, next) => {
-    try {
-        //console.log("is admin checker function")
-        let token = req.headers.authorization
-        token = token.replace('Bearer ', '')
-        //console.log("token in is admin function is ", token)
-        const verifyUserId = jwt.verify(token, secret)
-        const userId = verifyUserId._id
-        //console.log("verified user id is ", verifyUserId, " user id is ", userId)
-        const isAdmin = await userDAO.getRoleByUserId(userId)
-        //console.log("is admin result ", isAdmin)
-        return res.json({"admin":isAdmin})
-    } catch(e) {  
-        next(e)
+router.post("/isadmin", (req, res) => {
+  try {
+    let token = req.headers.authorization;
+
+    if (!token || !token.startsWith("Bearer ")) {
+      return res.status(401).json({ admin: false });
     }
 
+    token = token.replace("Bearer ", "");
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const isAdmin =
+      Array.isArray(decoded.roles) &&
+      decoded.roles.includes("admin");
+
+    return res.json({ admin: isAdmin });
+
+  } catch (err) {
+    return res.status(401).json({ admin: false });
+  }
 });
 
 router.post("/", async (req, res, next) => {
@@ -102,7 +106,11 @@ router.post("/", async (req, res, next) => {
                 //console.log("request user is ", req.user)
                 //console.log("user id is ", userId, " user email is ", userEmail, " and user role is ", userRoles)
                 //let token = jwt.sign({email: userEmail,_id: userId, roles:['user']}, secret)
-                let token = jwt.sign({email: userEmail,_id: userId, roles:userRoles}, secret)              
+                let token = jwt.sign(
+                    { email: userEmail, _id: userId, roles: userRoles },
+                    process.env.JWT_SECRET,
+                    { expiresIn: "7d" }
+                );         
                 req.headers.authorization = token
                 //console.log("returned token is ", token)
                 return res.json({token})

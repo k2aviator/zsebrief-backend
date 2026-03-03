@@ -1,3 +1,6 @@
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV || "development"}`
+});
 const { Router } = require("express");
 const router = Router();
 const cors = require('cors')
@@ -8,7 +11,8 @@ router.use("/airports", require('./airports'));
 router.use("/departures", require('./departures'));
 router.use("/runways", require('./runways'));
 router.use("/login", require('./login'));
-router.use("/admin", require('./admin'))
+router.use("/admin", require('./admin'));
+router.use("/auth", require("./auth"));
 
 router.get("/", (req, res, next) => {
   res.send(`
@@ -19,6 +23,7 @@ router.get("/", (req, res, next) => {
         <a href="/departures">GET Departures</a><br>
         <a href="/runways">GET Runways</a><br>
         <a href="/login">GET Users</a><br>
+        <A href="/auth/vatsim/callback">VATSIM WSSO</a><br>
       </body>
     </html>
   `)
