@@ -11,7 +11,8 @@ const airportsSchema = new mongoose.Schema({
   LAT: {type: String },
   LONG: {type: String },
   NAME: { type: String },
-  NOTES: { type: String }, 
+  ARRIVAL_NOTES: { type: String }, 
+  AIRPORT_NOTES: { type: String }, 
   UPDATED_BY: { type: String }
 });
 
